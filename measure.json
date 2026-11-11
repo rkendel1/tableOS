@@ -54,16 +54,16 @@
       "lines": 623
     },
     "third-party": {
-      "files": 22,
-      "lines": 6128
+      "files": 0,
+      "lines": 0
     },
     "platform": {
       "files": 0,
       "lines": 0
     },
     "excluded": {
-      "files": 10,
-      "lines": 4365
+      "files": 6,
+      "lines": 4353
     },
     "unclassified": {
       "files": 0,
@@ -431,7 +431,7 @@
       "path": "package-lock.json",
       "class": "excluded",
       "basis": "lockfile",
-      "lines": 4365
+      "lines": 4353
     },
     {
       "path": "package.json",
@@ -597,162 +597,6 @@
       "basis": "scaffold (create-feltkit 0.3.24, unmodified)",
       "lines": 16,
       "scaffold": "unmodified"
-    },
-    {
-      "path": "vendor/stack-ui/README.md",
-      "class": "excluded",
-      "basis": "documentation",
-      "lines": 0
-    },
-    {
-      "path": "vendor/stack-ui/SHA256SUMS",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 0
-    },
-    {
-      "path": "vendor/stack-ui/core/bin/conformance.mjs",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 143
-    },
-    {
-      "path": "vendor/stack-ui/core/classic/stack-ui-core-stateless.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 1290
-    },
-    {
-      "path": "vendor/stack-ui/core/classic/stack-ui-core.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 1338
-    },
-    {
-      "path": "vendor/stack-ui/core/package.json",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 40
-    },
-    {
-      "path": "vendor/stack-ui/core/src/brand.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 18
-    },
-    {
-      "path": "vendor/stack-ui/core/src/core.css",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 534
-    },
-    {
-      "path": "vendor/stack-ui/core/src/dom.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 177
-    },
-    {
-      "path": "vendor/stack-ui/core/src/html.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 27
-    },
-    {
-      "path": "vendor/stack-ui/core/src/index.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 5
-    },
-    {
-      "path": "vendor/stack-ui/core/src/states.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 169
-    },
-    {
-      "path": "vendor/stack-ui/core/src/theme.d.ts",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 10
-    },
-    {
-      "path": "vendor/stack-ui/core/src/theme.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 48
-    },
-    {
-      "path": "vendor/stack-ui/core/src/view.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 924
-    },
-    {
-      "path": "vendor/stack-ui/react/package.json",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 27
-    },
-    {
-      "path": "vendor/stack-ui/react/src/index.d.ts",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 443
-    },
-    {
-      "path": "vendor/stack-ui/react/src/index.js",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 136
-    },
-    {
-      "path": "vendor/stack-ui/tokens/brand/boundry-favicon.svg",
-      "class": "excluded",
-      "basis": "asset",
-      "lines": 0
-    },
-    {
-      "path": "vendor/stack-ui/tokens/brand/boundry-mark-reversed.svg",
-      "class": "excluded",
-      "basis": "asset",
-      "lines": 0
-    },
-    {
-      "path": "vendor/stack-ui/tokens/brand/boundry-mark.svg",
-      "class": "excluded",
-      "basis": "asset",
-      "lines": 0
-    },
-    {
-      "path": "vendor/stack-ui/tokens/css/tokens-light.css",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 141
-    },
-    {
-      "path": "vendor/stack-ui/tokens/css/tokens.css",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 381
-    },
-    {
-      "path": "vendor/stack-ui/tokens/package.json",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 28
-    },
-    {
-      "path": "vendor/stack-ui/tokens/src/brand.json",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 44
-    },
-    {
-      "path": "vendor/stack-ui/tokens/src/tokens.json",
-      "class": "third-party",
-      "basis": "path: vendor/",
-      "lines": 205
     },
     {
       "path": "vite.config.ts",

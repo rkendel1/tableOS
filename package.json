@@ -21,9 +21,9 @@
     "react-dom": "19.2.0"
   },
   "devDependencies": {
-    "@stack-ui/core": "file:vendor/stack-ui/core",
-    "@stack-ui/react": "file:vendor/stack-ui/react",
-    "@stack-ui/tokens": "file:vendor/stack-ui/tokens",
+    "@stack-ui/core": "0.8.1",
+    "@stack-ui/react": "0.8.1",
+    "@stack-ui/tokens": "0.8.1",
     "@types/node": "22.19.1",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
