@@ -7,10 +7,11 @@ import type * as inquiries_module from "../inquiries.js";
 import type * as insights_module from "../insights.js";
 import type * as menu_module from "../menu.js";
 import type * as public_module from "../public.js";
+import type * as publisher_module from "../publisher.js";
 import type * as reservations_module from "../reservations.js";
 import type * as restaurant_module from "../restaurant.js";
 import type * as reviews_module from "../reviews.js";
 import type * as setup_module from "../setup.js";
 
 /** Typed references to every query and mutation. Type-only imports: no backend code reaches the browser. */
-export const api = createApi<{ "app": typeof app_module; "guests": typeof guests_module; "inquiries": typeof inquiries_module; "insights": typeof insights_module; "menu": typeof menu_module; "public": typeof public_module; "reservations": typeof reservations_module; "restaurant": typeof restaurant_module; "reviews": typeof reviews_module; "setup": typeof setup_module }>();
+export const api = createApi<{ "app": typeof app_module; "guests": typeof guests_module; "inquiries": typeof inquiries_module; "insights": typeof insights_module; "menu": typeof menu_module; "public": typeof public_module; "publisher": typeof publisher_module; "reservations": typeof reservations_module; "restaurant": typeof restaurant_module; "reviews": typeof reviews_module; "setup": typeof setup_module }>();

@@ -13,6 +13,7 @@ import type { MutationCtx, QueryCtx } from "@feltdb/feltkit";
 import { guests, hoursExceptions, locations, reservations, tables, weeklyHours } from "./app.js";
 import { checkSlot, hoursOn, type Situation } from "./_availability.js";
 import { actorOf, record } from "./_audit.js";
+import { announce } from "./_announce.js";
 import { emailKey, looksLikeEmail, phoneKey } from "./_rules.js";
 import { isValidDate } from "./_time.js";
 
@@ -137,6 +138,6 @@ export async function book(ctx: MutationCtx, input: BookInput): Promise<BookResu
     updatedAt: now,
   });
   await record(ctx, "reservation", id, "reservation.booked", { source: input.source, date: input.date, time: input.time, partySize: input.partySize, table: check.table!.label, guestId });
-  ctx.afterCommit.webhooks.emit("reservation.booked", { reservationId: id, locationId: input.locationId, date: input.date, time: input.time, partySize: input.partySize, source: input.source });
+  announce(ctx, "reservation.booked", { reservationId: id, locationId: input.locationId, date: input.date, time: input.time, partySize: input.partySize, source: input.source });
   return { reservationId: id, code, status: "booked", date: input.date, time: input.time, partySize: input.partySize, locationName: location.name, tableLabel: check.table!.label, replayed: false };
 }

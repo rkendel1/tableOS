@@ -9,6 +9,7 @@
 import { fail, s } from "@feltdb/feltkit";
 import { app, guests, inquiries, INQUIRY_CATEGORIES, messages } from "./app.js";
 import { record } from "./_audit.js";
+import { announce } from "./_announce.js";
 import { categorizeInquiry } from "./_rules.js";
 import { resolveGuest } from "./_booking.js";
 import { GuestInput } from "./_views.js";
@@ -66,7 +67,7 @@ export const log = app.mutation({
     const inquiryId = await ctx.db.insert(inquiries, { guestId, ...(locationId ? { locationId } : {}), subject: subject.trim(), category, categorizedBy: "rules", channel, status: "open", createdAt: now, lastMessageAt: now });
     await ctx.db.insert(messages, { inquiryId, direction: "inbound", body: message.trim(), status: "received", author: who.id, authorType: who.type, at: now });
     await record(ctx, "inquiry", inquiryId, "inquiry.received", { channel, category, loggedBy: who.id });
-    ctx.afterCommit.webhooks.emit("inquiry.received", { inquiryId, category });
+    announce(ctx, "inquiry.received", { inquiryId, category });
     return { inquiryId, category };
   },
 });
@@ -117,7 +118,7 @@ export const approveReply = app.mutation({
     const saved = await ctx.db.patch(messages, messageId, { status: "ready", body: finalBody, approvedBy: who.id });
     await ctx.db.patch(inquiries, m.inquiryId, { status: "awaiting_guest", lastMessageAt: Date.now() });
     await record(ctx, "inquiry", m.inquiryId, "reply.approved", { messageId, edited: finalBody !== m.body, draftedBy: m.author, draftedByType: m.authorType });
-    ctx.afterCommit.webhooks.emit("message.ready", { messageId, inquiryId: m.inquiryId });
+    announce(ctx, "message.ready", { messageId, inquiryId: m.inquiryId });
     return saved;
   },
 });

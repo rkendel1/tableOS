@@ -16,8 +16,6 @@ const READ = [
   "restaurant.read", "hours.read", "menu.read", "reservations.read", "waitlist.read",
   "guests.read", "inquiries.read", "reviews.read", "insights.read", "audit.read",
 ];
-/** Staff use the in-app inbox and announce changes to subscribed systems (webhooks run as the caller). */
-const STAFF_SERVICES = ["webhooks.emit", "webhooks.deliver"];
 
 export const app = feltkit({
   name: "tableos",
@@ -27,7 +25,7 @@ export const app = feltkit({
     // Owners and managers run the restaurant: canonical information, menus, bookings, guests,
     // customer communication, reviews. Approving an agent's proposal requires holding the permission.
     manager: [
-      ...READ, ...STAFF_SERVICES,
+      ...READ,
       "restaurant.write", "hours.write", "tables.write", "menu.write",
       "reservations.write", "reservations.cancel", "reservations.floor", "waitlist.write",
       "guests.write", "inquiries.write", "inquiries.send", "reviews.write", "reviews.draft", "reviews.respond",
@@ -36,7 +34,7 @@ export const app = feltkit({
     // Hosts run the floor: bookings, waitlist, arrivals, guest notes, inquiries. They cannot change
     // canonical restaurant information, menus or publish review responses.
     host: [
-      ...READ, ...STAFF_SERVICES,
+      ...READ,
       "reservations.write", "reservations.cancel", "reservations.floor", "waitlist.write",
       "guests.write", "inquiries.write", "inquiries.send", "feltkit.agent.read",
     ],
@@ -46,11 +44,13 @@ export const app = feltkit({
     // It holds hours/menu/cancel permissions only through approval: every such function is
     // `approval: "required"`, so an agent can propose it and a person who may perform it approves.
     agent: [
-      ...READ, "webhooks.emit", "webhooks.deliver",
+      ...READ,
       "reservations.write", "waitlist.write", "inquiries.write", "reviews.draft",
       "hours.write", "menu.write", "reservations.cancel",
       "feltkit.agent.*",
     ],
+    // The publisher application agent (feltkit/publisher.ts): announces committed changes as webhooks.
+    publisher: ["webhooks.emit", "webhooks.deliver"],
     // Platform administration in Studio (services, credentials, the model). Not a restaurant role.
     admin: ["intelligence.*", "credential.*", "configuration.*", "apikeys.*", "webhooks.*", "jobs.*", "schedules.*", "feltkit.operations.*"],
   },
@@ -86,11 +86,8 @@ export const Clock = s.string({ pattern: "^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)
 export const DateString = s.string({ pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" });
 export const Period = s.object({ open: Clock, close: Clock });
 
-export const DIETARY = ["vegetarian", "vegan", "gluten_free", "dairy_free", "nut_free", "halal", "kosher", "spicy"] as const;
-export const ALLERGENS = ["gluten", "dairy", "egg", "peanut", "tree_nut", "soy", "fish", "shellfish", "sesame", "mustard", "celery", "sulphites"] as const;
-export const RESERVATION_STATUS = ["booked", "seated", "completed", "cancelled", "no_show"] as const;
-export const INQUIRY_CATEGORIES = ["reservation", "private_event", "menu_dietary", "feedback", "hours_location", "other"] as const;
-export const REVIEW_SOURCES = ["direct", "google", "yelp", "tripadvisor", "opentable", "other"] as const;
+export { DIETARY, ALLERGENS, RESERVATION_STATUS, INQUIRY_CATEGORIES, REVIEW_SOURCES } from "./_constants.js";
+import { DIETARY, ALLERGENS, RESERVATION_STATUS, INQUIRY_CATEGORIES, REVIEW_SOURCES, SUBJECT_TYPES } from "./_constants.js";
 
 // ---- Restaurant and locations -------------------------------------------------------------------
 
@@ -322,7 +319,7 @@ export const reviews = app.collection("reviews", {
 
 // ---- Audit trail --------------------------------------------------------------------------------
 
-export const SUBJECTS = ["restaurant", "location", "hours", "table", "menu", "reservation", "waitlist", "guest", "inquiry", "review"] as const;
+export const SUBJECTS = SUBJECT_TYPES;
 
 export const events = app.collection("events", {
   subjectType: s.enum(SUBJECTS),

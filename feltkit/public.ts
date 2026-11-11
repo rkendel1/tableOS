@@ -11,6 +11,7 @@ import { app, DateString, Clock, hoursExceptions, inquiries, locations, menuItem
 import { book, resolveGuest, situation } from "./_booking.js";
 import { canTransition, hoursOn, slotsFor } from "./_availability.js";
 import { record } from "./_audit.js";
+import { announce } from "./_announce.js";
 import { categorizeInquiry } from "./_rules.js";
 import { addDays, localNow } from "./_time.js";
 import { BookResult, Slots } from "./_views.js";
@@ -51,8 +52,12 @@ export const info = app.query({
           .map((e) => ({ date: e.date, closed: e.closed, periods: e.periods, ...(e.note ? { note: e.note } : {}) })),
       });
     }
-    const pick = r ? Object.fromEntries((["name", "tagline", "description", "cuisine", "phone", "email", "website"] as const).filter((k) => r[k] !== undefined).map((k) => [k, r[k]])) : null;
-    return { restaurant: pick as { name: string } | null, locations: out };
+    const pick = r ? {
+      name: r.name,
+      ...(r.tagline ? { tagline: r.tagline } : {}), ...(r.description ? { description: r.description } : {}), ...(r.cuisine ? { cuisine: r.cuisine } : {}),
+      ...(r.phone ? { phone: r.phone } : {}), ...(r.email ? { email: r.email } : {}), ...(r.website ? { website: r.website } : {}),
+    } : null;
+    return { restaurant: pick, locations: out };
   },
 });
 
@@ -148,7 +153,7 @@ export const cancelMyBooking = app.mutation({
     if (!canTransition(r.status, "cancelled")) fail("FAILED_PRECONDITION", `This reservation is ${r.status.replace("_", " ")} and can no longer be cancelled online.`);
     await ctx.db.patch(reservations, r.id, { status: "cancelled", cancelReason: "Cancelled by the guest online", updatedAt: Date.now() });
     await record(ctx, "reservation", r.id, "reservation.cancelled", { from: r.status, reason: "guest", by: "guest" });
-    ctx.afterCommit.webhooks.emit("reservation.cancelled", { reservationId: r.id, locationId: r.locationId, date: r.date, time: r.time });
+    announce(ctx, "reservation.cancelled", { reservationId: r.id, locationId: r.locationId, date: r.date, time: r.time });
     return { status: "cancelled" };
   },
 });
@@ -169,7 +174,7 @@ export const contact = app.mutation({
     const inquiryId = await ctx.db.insert(inquiries, { guestId, ...(locationId ? { locationId } : {}), subject: subject.trim(), category, categorizedBy: "rules", channel: "web", status: "open", createdAt: now, lastMessageAt: now });
     await ctx.db.insert(messages, { inquiryId, direction: "inbound", body: message.trim(), status: "received", author: guestId, authorType: "guest", at: now });
     await record(ctx, "inquiry", inquiryId, "inquiry.received", { channel: "web", category, guestId });
-    ctx.afterCommit.webhooks.emit("inquiry.received", { inquiryId, category });
+    announce(ctx, "inquiry.received", { inquiryId, category });
     return { inquiryId, received: true };
   },
 });

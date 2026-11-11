@@ -6,8 +6,10 @@
  * (menu.issues) proposes the fix, and a person approves it.
  */
 import { fail, s } from "@feltdb/feltkit";
+import type { MutationCtx } from "@feltdb/feltkit";
 import { ALLERGENS, app, DIETARY, menuItems, menus, menuSections } from "./app.js";
 import { record } from "./_audit.js";
+import { announce } from "./_announce.js";
 import { menuIssues } from "./_rules.js";
 
 const MenuView = s.doc(menus);
@@ -38,8 +40,8 @@ export const issues = app.query({
   },
 });
 
-function announce(ctx: { afterCommit: { webhooks: { emit(event: string, payload: Record<string, unknown>): void } } }, data: Record<string, unknown>) {
-  ctx.afterCommit.webhooks.emit("menu.changed", data);
+function menuChanged(ctx: Pick<MutationCtx, "afterCommit">, data: Record<string, unknown>) {
+  announce(ctx, "menu.changed", data);
 }
 
 export const saveMenu = app.mutation({
@@ -61,7 +63,7 @@ export const saveMenu = app.mutation({
       saved = (await ctx.db.get(menus, await ctx.db.insert(menus, doc)))!;
       await record(ctx, "menu", saved.id, "menu.created", { name: saved.name });
     }
-    announce(ctx, { menuId: saved.id });
+    menuChanged(ctx, { menuId: saved.id });
     return saved;
   },
 });
@@ -77,7 +79,7 @@ export const saveSection = app.mutation({
     if (!(await ctx.db.get(menus, fields.menuId))) fail("NOT_FOUND", `No menu ${fields.menuId}.`);
     const saved = id ? await ctx.db.replace(menuSections, id, fields) : (await ctx.db.get(menuSections, await ctx.db.insert(menuSections, fields)))!;
     await record(ctx, "menu", fields.menuId, id ? "section.updated" : "section.created", { sectionId: saved.id, name: saved.name });
-    announce(ctx, { menuId: fields.menuId });
+    menuChanged(ctx, { menuId: fields.menuId });
     return saved;
   },
 });
@@ -124,12 +126,12 @@ export const saveItem = app.mutation({
         ...(changed.includes("priceCents") ? { priceCents: { before: existing.priceCents, after: saved.priceCents } } : {}),
         ...(changed.includes("available") ? { available: { before: existing.available, after: saved.available } } : {}),
       });
-      announce(ctx, { menuId: section.menuId, itemId: id, changed });
+      menuChanged(ctx, { menuId: section.menuId, itemId: id, changed });
       return saved;
     }
     const newId = await ctx.db.insert(menuItems, doc);
     await record(ctx, "menu", section.menuId, "item.created", { itemId: newId, name: doc.name, priceCents: doc.priceCents });
-    announce(ctx, { menuId: section.menuId, itemId: newId });
+    menuChanged(ctx, { menuId: section.menuId, itemId: newId });
     return (await ctx.db.get(menuItems, newId))!;
   },
 });
@@ -146,7 +148,7 @@ export const setAvailability = app.mutation({
     if (!existing) fail("NOT_FOUND", `No menu item ${itemId}.`);
     const saved = await ctx.db.patch(menuItems, itemId, { available, updatedAt: Date.now(), updatedBy: who });
     await record(ctx, "menu", existing.menuId, "item.availability", { itemId, name: existing.name, before: existing.available, after: available });
-    announce(ctx, { menuId: existing.menuId, itemId, changed: ["available"] });
+    menuChanged(ctx, { menuId: existing.menuId, itemId, changed: ["available"] });
     return saved;
   },
 });
@@ -163,7 +165,7 @@ export const removeItem = app.mutation({
     if (!existing) return { removed: false };
     await ctx.db.delete(menuItems, itemId);
     await record(ctx, "menu", existing.menuId, "item.removed", { itemId, was: { name: existing.name, priceCents: existing.priceCents, sectionId: existing.sectionId } });
-    announce(ctx, { menuId: existing.menuId, itemId, changed: ["removed"] });
+    menuChanged(ctx, { menuId: existing.menuId, itemId, changed: ["removed"] });
     return { removed: true };
   },
 });

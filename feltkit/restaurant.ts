@@ -8,6 +8,7 @@
 import { fail, s } from "@feltdb/feltkit";
 import { app, hoursExceptions, locations, Period, ReservationRules, restaurant, tables, weeklyHours, DateString } from "./app.js";
 import { record } from "./_audit.js";
+import { announce } from "./_announce.js";
 import { DEFAULT_RULES } from "./_defaults.js";
 import { periodProblems } from "./_availability.js";
 import { isValidDate, isValidTimeZone } from "./_time.js";
@@ -49,7 +50,7 @@ export const update = app.mutation({
     const saved = existing ? await ctx.db.replace(restaurant, existing.id, fields) : await ctx.db.get(restaurant, await ctx.db.insert(restaurant, fields));
     const changed = existing ? Object.keys(fields).filter((k) => k !== "updatedAt" && (existing as Record<string, unknown>)[k] !== (fields as Record<string, unknown>)[k]) : Object.keys(clean);
     await record(ctx, "restaurant", saved!.id, existing ? "restaurant.updated" : "restaurant.created", { changed });
-    ctx.afterCommit.webhooks.emit("restaurant.changed", { restaurantId: saved!.id, changed });
+    announce(ctx, "restaurant.changed", { restaurantId: saved!.id, changed });
     return saved!;
   },
 });
@@ -103,7 +104,7 @@ export const updateLocation = app.mutation({
     const { phone: _old, ...rest } = existing;
     const saved = await ctx.db.replace(locations, id, { ...rest, ...input, ...(phone?.trim() ? { phone: phone.trim() } : {}), updatedAt: Date.now(), updatedBy: who });
     await record(ctx, "location", id, "location.updated", { before: { name: existing.name, slug: existing.slug, active: existing.active, timeZone: existing.timeZone }, after: { name: saved.name, slug: saved.slug, active: saved.active, timeZone: saved.timeZone } });
-    ctx.afterCommit.webhooks.emit("restaurant.changed", { locationId: id });
+    announce(ctx, "restaurant.changed", { locationId: id });
     return saved;
   },
 });
@@ -161,7 +162,7 @@ export const setWeekly = app.mutation({
     const fields = { locationId, weekday, periods, updatedAt: Date.now(), updatedBy: who };
     const saved = existing ? await ctx.db.replace(weeklyHours, existing.id, fields) : (await ctx.db.get(weeklyHours, await ctx.db.insert(weeklyHours, fields)))!;
     await record(ctx, "hours", locationId, "hours.weekly.set", { weekday, before: existing?.periods ?? [], after: periods });
-    ctx.afterCommit.webhooks.emit("hours.changed", { locationId, weekday });
+    announce(ctx, "hours.changed", { locationId, weekday });
     return saved;
   },
 });
@@ -184,7 +185,7 @@ export const setException = app.mutation({
     const fields = { locationId, date, closed, periods: closed ? [] : periods, ...(note?.trim() ? { note: note.trim() } : {}), updatedAt: Date.now(), updatedBy: who };
     const saved = existing ? await ctx.db.replace(hoursExceptions, existing.id, fields) : (await ctx.db.get(hoursExceptions, await ctx.db.insert(hoursExceptions, fields)))!;
     await record(ctx, "hours", locationId, "hours.exception.set", { date, closed, periods: fields.periods, note: fields.note ?? null, replaced: existing ? { closed: existing.closed, periods: existing.periods } : null });
-    ctx.afterCommit.webhooks.emit("hours.changed", { locationId, date });
+    announce(ctx, "hours.changed", { locationId, date });
     return saved;
   },
 });
@@ -200,7 +201,7 @@ export const removeException = app.mutation({
     if (!existing) return { removed: false };
     await ctx.db.delete(hoursExceptions, existing.id);
     await record(ctx, "hours", locationId, "hours.exception.removed", { date, was: { closed: existing.closed, periods: existing.periods, note: existing.note ?? null } });
-    ctx.afterCommit.webhooks.emit("hours.changed", { locationId, date });
+    announce(ctx, "hours.changed", { locationId, date });
     return { removed: true };
   },
 });

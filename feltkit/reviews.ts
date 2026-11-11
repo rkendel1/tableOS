@@ -10,6 +10,7 @@
 import { fail, s } from "@feltdb/feltkit";
 import { app, reviews, REVIEW_SOURCES, DateString } from "./app.js";
 import { actorOf, record } from "./_audit.js";
+import { announce } from "./_announce.js";
 import { reviewThemes, THEME_METHOD } from "./_rules.js";
 import { isValidDate } from "./_time.js";
 
@@ -135,7 +136,7 @@ export const approveResponse = app.mutation({
     const finalText = text?.trim() || r.response.text;
     const saved = await ctx.db.patch(reviews, id, { response: { ...r.response, text: finalText, status: "approved", approvedBy: who.id, approvedAt: Date.now() } });
     await record(ctx, "review", id, "response.approved", { edited: finalText !== r.response.text, draftedBy: r.response.draftedBy, draftedByType: r.response.draftedByType });
-    ctx.afterCommit.webhooks.emit("review.response.approved", { reviewId: id, source: r.source, externalId: r.externalId });
+    announce(ctx, "review.response.approved", { reviewId: id, source: r.source, externalId: r.externalId });
     return saved;
   },
 });

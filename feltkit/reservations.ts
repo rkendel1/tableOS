@@ -8,6 +8,7 @@ import { app, DateString, Clock, events, guests, reservations, RESERVATION_STATU
 import { book, resolveGuest, situation } from "./_booking.js";
 import { canTransition, checkSlot, nextStatuses, slotsFor } from "./_availability.js";
 import { record } from "./_audit.js";
+import { announce } from "./_announce.js";
 import { BookResult, GuestInput, Slots } from "./_views.js";
 
 export const availability = app.query({
@@ -119,7 +120,7 @@ export const modify = app.mutation({
       before: { date: r.date, time: r.time, partySize: r.partySize, tableId: r.tableId, specialRequests: r.specialRequests ?? null },
       after: { date, time, partySize, tableId, table: table?.label, specialRequests: specialRequests ?? null },
     });
-    ctx.afterCommit.webhooks.emit("reservation.changed", { reservationId: id, date, time, partySize });
+    announce(ctx, "reservation.changed", { reservationId: id, date, time, partySize });
     return { id, date: saved.date, time: saved.time, partySize: saved.partySize, tableLabel: table?.label ?? "?", status: saved.status };
   },
 });
@@ -137,7 +138,7 @@ export const cancel = app.mutation({
     if (!canTransition(r.status, "cancelled")) fail("FAILED_PRECONDITION", `The reservation is ${r.status} and cannot be cancelled.`);
     await ctx.db.patch(reservations, id, { status: "cancelled", cancelReason: reason.trim(), updatedAt: Date.now() });
     await record(ctx, "reservation", id, "reservation.cancelled", { from: r.status, reason: reason.trim(), by: "staff" });
-    ctx.afterCommit.webhooks.emit("reservation.cancelled", { reservationId: id, locationId: r.locationId, date: r.date, time: r.time });
+    announce(ctx, "reservation.cancelled", { reservationId: id, locationId: r.locationId, date: r.date, time: r.time });
     return { id, status: "cancelled" };
   },
 });
