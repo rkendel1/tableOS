@@ -48,8 +48,7 @@ npx feltkit deploy --target container   # verified Node/Docker artifact in .felt
 | `feltkit/guests.ts`, `inquiries.ts`, `reviews.ts`, `insights.ts` | customer operations, reputation, today's picture, audit trail |
 | `feltkit/publisher.ts` | an application agent (deterministic handler) that announces committed changes as webhooks |
 | `feltkit/_rules.ts`, `_time.ts` | pure rules: menu checks, inquiry triage, review themes, local time |
-| `src/` | management UI (stack-ui `Shell`) and the public site (`src/site`) |
-| `vendor/stack-ui` | stack-ui 0.7.0, vendored unmodified (it is not published to npm) |
+| `src/` | management UI (stack-ui `Shell`, from npm `@stack-ui/*` 0.8.1) and the public site (`src/site`) |
 
 Key guarantees, each covered by tests in `tests/`:
 

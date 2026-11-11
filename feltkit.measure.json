@@ -1,0 +1,13 @@
+{
+  "report": "measure.json",
+  "classify": [
+    {
+      "path": "scripts/smoke-http.mjs",
+      "class": "tests",
+      "reason": "an HTTP smoke test against a running server"
+    }
+  ],
+  "acknowledged": {
+    "audit-trail:feltkit/app.ts": "TableOS's own events collection; it moves to app.auditTrail once FeltKit ships its typed trail"
+  }
+}
