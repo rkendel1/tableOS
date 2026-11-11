@@ -173,7 +173,7 @@ test("the waitlist books through the same availability rules", async () => {
 test("public booking: rules apply, the guest gets a code to view and cancel their own booking, nobody else's", async () => {
   const { t, locationId, date, key } = await restaurantFixture();
   try {
-    const visitor = t.as({ id: "visitor", type: "user", roles: [] });
+    const visitor = t;
     await assert.rejects(visitor.mutation(api.public.bookTable, { locationId, date, time: "21:30", partySize: 2, name: "Ana", email: "ana@example.com", idempotencyKey: key() }), (e: any) => e.code === "FAILED_PRECONDITION" && e.details?.reason === "outside_hours");
     const r = await visitor.mutation(api.public.bookTable, { locationId, date, time: "19:00", partySize: 2, name: "Ana", email: "ana@example.com", specialRequests: "Anniversary", idempotencyKey: key() });
     assert.ok(r.code.length >= 20);

@@ -16,7 +16,7 @@ const sam = { id: "sam", type: "user" as const, roles: ["host"] };
 test("inquiries: received from the site, categorized by rules, drafted by the agent, approved by a person, recorded as sent", async () => {
   const { t } = await restaurantFixture();
   try {
-    const visitor = t.as({ id: "visitor", type: "user", roles: [] });
+    const visitor = t;
     const { inquiryId } = await visitor.mutation(api.public.contact, { name: "Rosa", email: "rosa@example.com", subject: "Rehearsal dinner", message: "Do you have a private room for 20 on a Saturday in June?" });
     let detail = await t.as("sam").query(api.inquiries.get, { id: inquiryId });
     assert.deepEqual([detail.inquiry.category, detail.inquiry.categorizedBy, detail.inquiry.channel, detail.messages.length], ["private_event", "rules", "web", 1]);
@@ -39,7 +39,8 @@ test("inquiries: received from the site, categorized by rules, drafted by the ag
     const trail = await t.as("maria").query(api.insights.audit, { subjectType: "inquiry", subjectId: inquiryId });
     assert.deepEqual(trail.map((e) => e.type).reverse(), ["inquiry.received", "reply.drafted", "reply.approved", "reply.sent.recorded"]);
     assert.equal(trail.find((e) => e.type === "reply.approved")!.data!.edited, true);
-    assert.equal(trail.find((e) => e.type === "inquiry.received")!.actorType, "user");
+    const received = trail.find((e) => e.type === "inquiry.received")!;
+    assert.deepEqual([received.actor, received.actorType], ["public", "anonymous"], "a visitor on the site, not a signed-in account");
   } finally {
     await t.close();
   }
