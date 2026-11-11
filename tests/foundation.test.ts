@@ -34,8 +34,10 @@ test("only roles holding the permission can change canonical records", async () 
     await assert.rejects(t.as(AGENT).mutation(api.restaurant.update, { name: "Agent's Diner" }), { code: "FORBIDDEN" }, "the agent has no restaurant.write");
     // The agent holds hours.write, but the function requires a person's approval: calling it directly is refused.
     await assert.rejects(t.as(AGENT).mutation(api.restaurant.setException, { locationId, date, closed: true, periods: [] }), (e: any) => e.code === "FORBIDDEN" && /approval/.test(e.message));
-    // An unauthenticated caller reaches public functions only.
-    await assert.rejects(t.as({ id: "anon", type: "user", roles: [] }).query(api.guests.list, {}), { code: "FORBIDDEN" });
+    // A caller with no session (t itself is anonymous) reaches public functions only; a signed-in
+    // account without a staff role is refused differently (FORBIDDEN, not UNAUTHORIZED).
+    await assert.rejects(t.query(api.guests.list, {}), { code: "UNAUTHORIZED" });
+    await assert.rejects(t.as({ id: "diner", type: "user", roles: [] }).query(api.guests.list, {}), { code: "FORBIDDEN" });
     assert.equal((await t.as("lee").query(api.restaurant.get, {}))?.name, "Juniper & Salt", "nothing changed");
   } finally {
     await t.close();
@@ -57,7 +59,7 @@ test("special hours change what can be booked and what the public site shows, fo
   const { t, locationId, date } = await restaurantFixture();
   try {
     const maria = t.as("maria");
-    const before = await t.as({ id: "visitor", type: "user", roles: [] }).query(api.public.availability, { locationId, date, partySize: 2 });
+    const before = await t.query(api.public.availability, { locationId, date, partySize: 2 });
     assert.equal(before.slots.at(-1)!.time, "21:00");
 
     // Friday-style late night on one date.
@@ -73,7 +75,7 @@ test("special hours change what can be booked and what the public site shows, fo
     await maria.mutation(api.restaurant.setException, { locationId, date: closureDate, closed: true, periods: [], note: "Private event" });
     const closed = await t.as("lee").query(api.reservations.availability, { locationId, date: closureDate, partySize: 2 });
     assert.deepEqual([closed.open, closed.slots.length, closed.note], [false, 0, "Private event"]);
-    const info = await t.as({ id: "visitor", type: "user", roles: [] }).query(api.public.info, {});
+    const info = await t.query(api.public.info, {});
     const listed = info.locations[0]!.upcomingExceptions.map((e) => [e.date, e.closed, e.note]);
     assert.deepEqual(listed, [[date, false, "Late night"], [closureDate, true, "Private event"]]);
 
@@ -96,7 +98,7 @@ test("menu changes are reflected in the public menu; unavailable and undeclared 
   const { t } = await restaurantFixture();
   try {
     const maria = t.as("maria");
-    const visitor = t.as({ id: "visitor", type: "user", roles: [] });
+    const visitor = t;
     const menu = await maria.mutation(api.menu.saveMenu, { name: "Dinner", active: true, locationIds: [], position: 0 });
     const section = await maria.mutation(api.menu.saveSection, { menuId: menu.id, name: "Mains", position: 0 });
     const item = await maria.mutation(api.menu.saveItem, { sectionId: section.id, name: "Hake", description: "Brown butter", priceCents: 3400, dietary: [], allergens: ["fish", "dairy"], available: true, position: 0 });
@@ -129,9 +131,9 @@ test("menu changes are reflected in the public menu; unavailable and undeclared 
 test("the public site never exposes guest data or staff-only records", async () => {
   const { t } = await restaurantFixture();
   try {
-    const visitor = t.as({ id: "visitor", type: "user", roles: [] });
+    const visitor = t;
     for (const fn of [api.guests.list, api.reservations.list, api.inquiries.list, api.reviews.list, api.insights.audit] as const) {
-      await assert.rejects((visitor.query as any)(fn, {}), { code: "FORBIDDEN" });
+      await assert.rejects((visitor.query as any)(fn, {}), { code: "UNAUTHORIZED" });
     }
     const info = await visitor.query(api.public.info, {});
     assert.equal(info.restaurant?.name, "Juniper & Salt");
