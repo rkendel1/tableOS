@@ -1,0 +1,19 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      # What the app is made of, kept in measure.json: fails on stale generated code, stale declarations,
+      # unclassified code, or a report that no longer matches the repository.
+      - run: npx feltkit measure --check

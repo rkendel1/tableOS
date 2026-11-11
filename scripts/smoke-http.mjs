@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Anonymous public path against a RUNNING TableOS (`npm run dev` or `npm start`), over real HTTP with
- * no session — the caller `createTestApp` cannot express. Needs a restaurant with at least one bookable
+ * no session (tests use createTestApp's own anonymous caller; this checks the real server). Needs a restaurant with at least one bookable
  * location (in development: Today → "Load sample restaurant").
  *
  *   node scripts/smoke-http.mjs [http://localhost:3000]

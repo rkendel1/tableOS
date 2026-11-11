@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "TableOS: a restaurant front-office application on FeltKit — profile, hours, menus, reservations, inquiries, guests and reviews.",
+  "description": "TableOS: a restaurant front-office application on FeltKit \u2014 profile, hours, menus, reservations, inquiries, guests and reviews.",
   "scripts": {
     "dev": "feltkit dev",
     "build": "feltkit build",
@@ -12,10 +12,11 @@
     "inspect": "feltkit inspect",
     "deploy": "feltkit deploy",
     "codegen": "feltkit codegen",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "measure": "feltkit measure"
   },
   "dependencies": {
-    "@feltdb/feltkit": "0.3.24",
+    "@feltdb/feltkit": "0.3.25",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },

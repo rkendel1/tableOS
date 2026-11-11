@@ -1,0 +1,765 @@
+{
+  "schema": "feltkit.measure/1",
+  "app": {
+    "name": "tableos",
+    "feltkit": "0.3.25",
+    "installed": "0.3.25"
+  },
+  "method": {
+    "files": "git ls-files (tracked, and untracked files that are not ignored); node_modules, dist, .feltkit and .git are never counted",
+    "lines": "lines that are not blank and not only a comment; JSON/YAML/TOML count non-blank lines; assets and documentation count 0",
+    "consumption": "static call sites of ctx.* and of names imported from @feltdb/feltkit, in authored code and tests",
+    "findings": "static patterns in authored code; a finding is a candidate for review, not a verdict"
+  },
+  "provenance": {
+    "scaffold": {
+      "manifest": "feltkit.scaffold.json",
+      "generator": "create-feltkit",
+      "version": "0.3.24",
+      "template": "tasks",
+      "files": 20,
+      "unmodified": 6,
+      "modified": 9,
+      "missing": 5
+    },
+    "generated": {
+      "file": "feltkit/_generated/api.ts",
+      "current": true
+    },
+    "skills": []
+  },
+  "totals": {
+    "domain": {
+      "files": 20,
+      "lines": 1978
+    },
+    "experience": {
+      "files": 16,
+      "lines": 1395
+    },
+    "infrastructure": {
+      "files": 0,
+      "lines": 0
+    },
+    "generated": {
+      "files": 4,
+      "lines": 34
+    },
+    "configuration": {
+      "files": 4,
+      "lines": 94
+    },
+    "tests": {
+      "files": 6,
+      "lines": 623
+    },
+    "third-party": {
+      "files": 22,
+      "lines": 6128
+    },
+    "platform": {
+      "files": 0,
+      "lines": 0
+    },
+    "excluded": {
+      "files": 10,
+      "lines": 4365
+    },
+    "unclassified": {
+      "files": 0,
+      "lines": 0
+    }
+  },
+  "authored": {
+    "files": 40,
+    "lines": 3467
+  },
+  "definitions": {
+    "app": {
+      "agent": 1,
+      "collection": 15,
+      "mutation": 39,
+      "query": 23
+    },
+    "collections": [
+      "restaurant",
+      "locations",
+      "weeklyHours",
+      "hoursExceptions",
+      "tables",
+      "menus",
+      "menuSections",
+      "menuItems",
+      "guests",
+      "reservations",
+      "waitlist",
+      "inquiries",
+      "messages",
+      "reviews",
+      "events"
+    ]
+  },
+  "consumption": [
+    {
+      "api": "@feltdb/feltkit s",
+      "callSites": 673,
+      "files": 11
+    },
+    {
+      "api": "ctx.db",
+      "callSites": 174,
+      "files": 11
+    },
+    {
+      "api": "@feltdb/feltkit fail",
+      "callSites": 73,
+      "files": 9
+    },
+    {
+      "api": "@feltdb/feltkit/react useMutation",
+      "callSites": 38,
+      "files": 8
+    },
+    {
+      "api": "ctx.auth",
+      "callSites": 31,
+      "files": 8
+    },
+    {
+      "api": "@feltdb/feltkit/react useQuery",
+      "callSites": 27,
+      "files": 10
+    },
+    {
+      "api": "@feltdb/feltkit feltkit",
+      "callSites": 8,
+      "files": 1
+    },
+    {
+      "api": "@feltdb/feltkit MutationCtx",
+      "callSites": 6,
+      "files": 4
+    },
+    {
+      "api": "@feltdb/feltkit QueryCtx",
+      "callSites": 2,
+      "files": 2
+    },
+    {
+      "api": "@feltdb/feltkit/react FeltKitProvider",
+      "callSites": 2,
+      "files": 1
+    },
+    {
+      "api": "@feltdb/feltkit/react useSession",
+      "callSites": 2,
+      "files": 1
+    },
+    {
+      "api": "ctx.afterCommit.agent",
+      "callSites": 2,
+      "files": 2
+    },
+    {
+      "api": "ctx.crypto",
+      "callSites": 2,
+      "files": 2
+    },
+    {
+      "api": "ctx.environment",
+      "callSites": 2,
+      "files": 1
+    },
+    {
+      "api": "@feltdb/feltkit/client createClient",
+      "callSites": 1,
+      "files": 1
+    },
+    {
+      "api": "@feltdb/feltkit/react FeltKitClientError",
+      "callSites": 1,
+      "files": 1
+    },
+    {
+      "api": "@feltdb/feltkit/react useConnectionState",
+      "callSites": 1,
+      "files": 1
+    },
+    {
+      "api": "@feltdb/feltkit/testing createTestApp",
+      "callSites": 1,
+      "files": 1
+    },
+    {
+      "api": "@feltdb/feltkit/testing TestApp",
+      "callSites": 1,
+      "files": 1
+    },
+    {
+      "api": "ctx.afterCommit.webhooks",
+      "callSites": 1,
+      "files": 1
+    },
+    {
+      "api": "ctx.requestId",
+      "callSites": 1,
+      "files": 1
+    },
+    {
+      "api": "ctx.services.webhooks",
+      "callSites": 1,
+      "files": 1
+    },
+    {
+      "api": "ctx.trigger",
+      "callSites": 1,
+      "files": 1
+    }
+  ],
+  "findings": [
+    {
+      "id": "audit-trail",
+      "title": "App-built business audit trail",
+      "file": "feltkit/app.ts",
+      "line": 324,
+      "evidence": "export const events = app.collection(\"events\", {",
+      "platform": "app.auditTrail (events written in the change's transaction, ordered per subject by a FeltDB sequence)",
+      "acknowledged": "TableOS's own events collection; it moves to app.auditTrail once FeltKit ships its typed trail"
+    }
+  ],
+  "checks": [
+    {
+      "name": "generated code current",
+      "ok": true,
+      "detail": "feltkit/_generated/api.ts matches what codegen writes",
+      "fix": "npx feltkit codegen"
+    },
+    {
+      "name": "declarations match files",
+      "ok": true,
+      "detail": "1 declaration(s), each matches a file",
+      "fix": "Remove or correct the stale entries in feltkit.measure.json."
+    },
+    {
+      "name": "every code file classified",
+      "ok": true,
+      "detail": "every file with code has a class",
+      "fix": "Declare them in feltkit.measure.json with a class and a reason."
+    },
+    {
+      "name": "acknowledged findings still exist",
+      "ok": true,
+      "detail": "1 acknowledged finding(s), each still present",
+      "fix": "Remove the resolved entries from \"acknowledged\" in feltkit.measure.json."
+    }
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "class": "configuration",
+      "basis": "configuration file",
+      "lines": 17
+    },
+    {
+      "path": ".gitignore",
+      "class": "generated",
+      "basis": "scaffold (create-feltkit 0.3.24, unmodified)",
+      "lines": 0,
+      "scaffold": "unmodified"
+    },
+    {
+      "path": "README.md",
+      "class": "excluded",
+      "basis": "documentation",
+      "lines": 0,
+      "scaffold": "modified"
+    },
+    {
+      "path": "docs/PLATFORM-AUDIT.md",
+      "class": "excluded",
+      "basis": "documentation",
+      "lines": 0
+    },
+    {
+      "path": "feltkit.measure.json",
+      "class": "configuration",
+      "basis": "configuration file",
+      "lines": 13
+    },
+    {
+      "path": "feltkit.scaffold.json",
+      "class": "configuration",
+      "basis": "configuration file",
+      "lines": 30
+    },
+    {
+      "path": "feltkit/_announce.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 4
+    },
+    {
+      "path": "feltkit/_audit.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 21
+    },
+    {
+      "path": "feltkit/_availability.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 109
+    },
+    {
+      "path": "feltkit/_booking.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 122
+    },
+    {
+      "path": "feltkit/_constants.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 6
+    },
+    {
+      "path": "feltkit/_defaults.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 10
+    },
+    {
+      "path": "feltkit/_generated/api.ts",
+      "class": "generated",
+      "basis": "codegen (matches regeneration)",
+      "lines": 13,
+      "scaffold": "modified"
+    },
+    {
+      "path": "feltkit/_rules.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 119
+    },
+    {
+      "path": "feltkit/_time.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 51
+    },
+    {
+      "path": "feltkit/_views.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 14
+    },
+    {
+      "path": "feltkit/app.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 258,
+      "scaffold": "modified"
+    },
+    {
+      "path": "feltkit/guests.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 84
+    },
+    {
+      "path": "feltkit/inquiries.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 155
+    },
+    {
+      "path": "feltkit/insights.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 59
+    },
+    {
+      "path": "feltkit/menu.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 154
+    },
+    {
+      "path": "feltkit/public.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 161
+    },
+    {
+      "path": "feltkit/publisher.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 11
+    },
+    {
+      "path": "feltkit/reservations.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 211
+    },
+    {
+      "path": "feltkit/restaurant.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 213
+    },
+    {
+      "path": "feltkit/reviews.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 142
+    },
+    {
+      "path": "feltkit/setup.ts",
+      "class": "domain",
+      "basis": "path: feltkit/ (server functions)",
+      "lines": 74
+    },
+    {
+      "path": "index.html",
+      "class": "experience",
+      "basis": "path: root (UI)",
+      "lines": 16,
+      "scaffold": "modified"
+    },
+    {
+      "path": "package-lock.json",
+      "class": "excluded",
+      "basis": "lockfile",
+      "lines": 4365
+    },
+    {
+      "path": "package.json",
+      "class": "configuration",
+      "basis": "configuration file",
+      "lines": 34,
+      "scaffold": "modified"
+    },
+    {
+      "path": "public/apple-touch-icon.png",
+      "class": "excluded",
+      "basis": "asset",
+      "lines": 0,
+      "scaffold": "unmodified"
+    },
+    {
+      "path": "public/favicon.png",
+      "class": "excluded",
+      "basis": "asset",
+      "lines": 0,
+      "scaffold": "unmodified"
+    },
+    {
+      "path": "public/feltkit-mark.png",
+      "class": "excluded",
+      "basis": "asset",
+      "lines": 0,
+      "scaffold": "unmodified"
+    },
+    {
+      "path": "public/theme.js",
+      "class": "experience",
+      "basis": "path: public/ (UI)",
+      "lines": 4,
+      "scaffold": "modified"
+    },
+    {
+      "path": "scripts/smoke-http.mjs",
+      "class": "tests",
+      "basis": "declared: an HTTP smoke test against a running server",
+      "lines": 38
+    },
+    {
+      "path": "src/App.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 123,
+      "scaffold": "modified"
+    },
+    {
+      "path": "src/fields.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 10
+    },
+    {
+      "path": "src/main.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 25,
+      "scaffold": "modified"
+    },
+    {
+      "path": "src/screens/Activity.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 29
+    },
+    {
+      "path": "src/screens/Guests.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 80
+    },
+    {
+      "path": "src/screens/Inquiries.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 109
+    },
+    {
+      "path": "src/screens/Menu.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 112
+    },
+    {
+      "path": "src/screens/Reservations.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 184
+    },
+    {
+      "path": "src/screens/Restaurant.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 185
+    },
+    {
+      "path": "src/screens/Reviews.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 106
+    },
+    {
+      "path": "src/screens/Today.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 70
+    },
+    {
+      "path": "src/site/Site.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 199
+    },
+    {
+      "path": "src/styles.css",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 69,
+      "scaffold": "modified"
+    },
+    {
+      "path": "src/ui.tsx",
+      "class": "experience",
+      "basis": "path: src/ (UI)",
+      "lines": 74
+    },
+    {
+      "path": "tests/fixture.ts",
+      "class": "tests",
+      "basis": "path: tests",
+      "lines": 32
+    },
+    {
+      "path": "tests/foundation.test.ts",
+      "class": "tests",
+      "basis": "path: tests",
+      "lines": 117
+    },
+    {
+      "path": "tests/operations.test.ts",
+      "class": "tests",
+      "basis": "path: tests",
+      "lines": 144
+    },
+    {
+      "path": "tests/reservations.test.ts",
+      "class": "tests",
+      "basis": "path: tests",
+      "lines": 177
+    },
+    {
+      "path": "tests/rules.test.ts",
+      "class": "tests",
+      "basis": "path: tests",
+      "lines": 115
+    },
+    {
+      "path": "tsconfig.json",
+      "class": "generated",
+      "basis": "scaffold (create-feltkit 0.3.24, unmodified)",
+      "lines": 16,
+      "scaffold": "unmodified"
+    },
+    {
+      "path": "vendor/stack-ui/README.md",
+      "class": "excluded",
+      "basis": "documentation",
+      "lines": 0
+    },
+    {
+      "path": "vendor/stack-ui/SHA256SUMS",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 0
+    },
+    {
+      "path": "vendor/stack-ui/core/bin/conformance.mjs",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 143
+    },
+    {
+      "path": "vendor/stack-ui/core/classic/stack-ui-core-stateless.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 1290
+    },
+    {
+      "path": "vendor/stack-ui/core/classic/stack-ui-core.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 1338
+    },
+    {
+      "path": "vendor/stack-ui/core/package.json",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 40
+    },
+    {
+      "path": "vendor/stack-ui/core/src/brand.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 18
+    },
+    {
+      "path": "vendor/stack-ui/core/src/core.css",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 534
+    },
+    {
+      "path": "vendor/stack-ui/core/src/dom.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 177
+    },
+    {
+      "path": "vendor/stack-ui/core/src/html.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 27
+    },
+    {
+      "path": "vendor/stack-ui/core/src/index.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 5
+    },
+    {
+      "path": "vendor/stack-ui/core/src/states.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 169
+    },
+    {
+      "path": "vendor/stack-ui/core/src/theme.d.ts",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 10
+    },
+    {
+      "path": "vendor/stack-ui/core/src/theme.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 48
+    },
+    {
+      "path": "vendor/stack-ui/core/src/view.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 924
+    },
+    {
+      "path": "vendor/stack-ui/react/package.json",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 27
+    },
+    {
+      "path": "vendor/stack-ui/react/src/index.d.ts",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 443
+    },
+    {
+      "path": "vendor/stack-ui/react/src/index.js",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 136
+    },
+    {
+      "path": "vendor/stack-ui/tokens/brand/boundry-favicon.svg",
+      "class": "excluded",
+      "basis": "asset",
+      "lines": 0
+    },
+    {
+      "path": "vendor/stack-ui/tokens/brand/boundry-mark-reversed.svg",
+      "class": "excluded",
+      "basis": "asset",
+      "lines": 0
+    },
+    {
+      "path": "vendor/stack-ui/tokens/brand/boundry-mark.svg",
+      "class": "excluded",
+      "basis": "asset",
+      "lines": 0
+    },
+    {
+      "path": "vendor/stack-ui/tokens/css/tokens-light.css",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 141
+    },
+    {
+      "path": "vendor/stack-ui/tokens/css/tokens.css",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 381
+    },
+    {
+      "path": "vendor/stack-ui/tokens/package.json",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 28
+    },
+    {
+      "path": "vendor/stack-ui/tokens/src/brand.json",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 44
+    },
+    {
+      "path": "vendor/stack-ui/tokens/src/tokens.json",
+      "class": "third-party",
+      "basis": "path: vendor/",
+      "lines": 205
+    },
+    {
+      "path": "vite.config.ts",
+      "class": "generated",
+      "basis": "scaffold (create-feltkit 0.3.24, unmodified)",
+      "lines": 5,
+      "scaffold": "unmodified"
+    }
+  ]
+}
